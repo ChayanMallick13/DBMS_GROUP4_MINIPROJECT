@@ -26,6 +26,8 @@ BEGIN
     UPDATE Rooms
     SET AvailabilityStatus = 'Booked'
     WHERE RoomID = p_RoomID;
+
+    SELECT * FROM Bookings b JOIN Payments p ON b.BookingID = p.BookingID JOIN Rooms r ON r.RoomID = b.RoomID; 
 END $$
 DELIMITER ;
 
