@@ -1,67 +1,75 @@
+
 USE HOTEL_MANAGEMENT_SYSTEM;
 
+
 -- Query 1
-SELECT * FROM Rooms 
-WHERE AvailabilityStatus = 'Available';
+SELECT * FROM Rooms
+WHERE AvaibilityStatus = TRUE;
+
 
 -- Query 2
-SELECT b.BookingID, g.Name, r.RoomType, b.CheckInDate, b.CheckOutDate
-FROM Bookings b
-JOIN Guests g ON b.GuestID = g.GuestID
-JOIN Rooms r ON b.RoomID = r.RoomID
-WHERE g.GuestID = 1;
+SELECT * FROM 
+Bookings b NATURAL JOIN Payments p
+WHERE b.GuestID = 2;
 
 -- Query 3
-UPDATE Rooms
-SET AvailabilityStatus = 'Booked'
-WHERE RoomID = 102;
+CALL make_booking(
+	2,
+    1,
+    '2025-04-03',
+    '2025-04-13'
+);
+-- show result
+SELECT * FROM Bookings;
 
 -- Query 4
-SELECT SUM(Amount) AS TotalEarnings
-FROM Payments;
+SELECT SUM(Amount) AS Total_Earnings FROM
+Payments;
 
 -- Query 5
-SELECT g.Name, COUNT(b.BookingID) AS BookingCount
-FROM Guests g
-JOIN Bookings b ON g.GuestID = b.GuestID
-GROUP BY g.Name
-HAVING COUNT(b.BookingID) > 1;
+SELECT * FROM
+(
+	SELECT GuestId , COUNT(BookingId) AS Booking_Count FROM Bookings GROUP BY GuestId HAVING Booking_Count > 1
+) b
+NATURAL JOIN Guests;
 
 -- Query 6
-SELECT r.RoomID, r.RoomType, b.CheckInDate, b.CheckOutDate
-FROM Rooms r
-JOIN Bookings b ON r.RoomID = b.RoomID
-WHERE MONTH(b.CheckInDate) = 4 AND YEAR(b.CheckInDate) = 2025;
+SELECT * FROM (SELECT RoomID,CheckInDate,CheckOutDate FROM Bookings 
+WHERE CheckInDate >= '2025-04-01' AND CheckOutDate <= '2025-04-30') b
+NATURAL JOIN Rooms;
 
 -- Query 7
-DELETE FROM Bookings
-WHERE BookingID = 2;
-
-UPDATE Rooms
-SET AvailabilityStatus = 'Available'
-WHERE RoomID = 101;
-
-SELECT * FROM Bookings b RIGHT JOIN Rooms r ON b.RoomID = r.RoomID;
+CALL delete_Booking(6);
+-- show result
+SELECT * FROM Bookings;
 
 -- Query 8
-SELECT b.BookingID, g.Name, r.RoomType, p.Amount
-FROM Payments p
-JOIN Bookings b ON p.BookingID = b.BookingID
-JOIN Guests g ON b.GuestID = g.GuestID
-JOIN Rooms r ON b.RoomID = r.RoomID
-WHERE p.Amount > 500;
+SELECT * FROM 
+(SELECT * FROM Payments WHERE Amount > 500) p
+NATURAL JOIN Bookings;
 
 -- Query 9
-SELECT r.RoomType, COUNT(b.BookingID) AS BookingCount
-FROM Rooms r
-JOIN Bookings b ON r.RoomID = b.RoomID
-GROUP BY r.RoomType
-ORDER BY BookingCount DESC
-LIMIT 1;
+SELECT r.RoomType , r.Price, COUNT(b.BookingId) AS Bookings_count FROM
+Bookings b NATURAL JOIN Rooms r
+GROUP BY r.RoomType,r.Price
+HAVING Bookings_count >= ALL (
+	SELECT COUNT(b.BookingId) AS cnt FROM
+	Bookings b NATURAL JOIN Rooms r
+	GROUP BY r.RoomType,r.Price
+)
+;
+
 
 -- Query 10
-SELECT g.Name, b.CheckInDate, b.CheckOutDate, DATEDIFF(b.CheckOutDate, b.CheckInDate) AS Duration
-FROM Guests g
-JOIN Bookings b ON g.GuestID = b.GuestID
-ORDER BY Duration DESC
-LIMIT 1;
+SELECT * FROM 
+(
+SELECT GuestID,(CheckOutDate-CheckInDate) AS stayDuration FROM
+		Bookings WHERE (CheckOutDate-CheckInDate) >=  (
+			SELECT MAX((CheckOutDate-CheckInDate)) FROM
+			Bookings
+		)
+) b
+NATURAL JOIN 
+Guests g;
+        
+

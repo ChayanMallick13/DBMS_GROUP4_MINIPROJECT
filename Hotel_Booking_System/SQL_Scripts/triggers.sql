@@ -1,27 +1,34 @@
+
+
 USE HOTEL_MANAGEMENT_SYSTEM;
 
-DROP TRIGGER IF EXISTS trg_after_booking_insert;
+DROP TRIGGER IF EXISTS trg_after_booking;
 
-DELIMITER $$
-CREATE TRIGGER trg_after_booking_insert
-AFTER INSERT ON Bookings
+delimiter $$
+CREATE TRIGGER trg_after_booking
+AFTER INSERT ON bookings
 FOR EACH ROW
 BEGIN
-    UPDATE Rooms
-    SET AvailabilityStatus = 'Booked'
+
+	UPDATE Rooms 
+    SET AvaibilityStatus = FALSE
     WHERE RoomID = NEW.RoomID;
+
 END $$
-DELIMITER ;
+delimiter ;
 
-DROP TRIGGER IF EXISTS trg_after_booking_delete;
 
-DELIMITER $$
-CREATE TRIGGER trg_after_booking_delete
+DROP TRIGGER IF EXISTS tgr_delete_bookings;
+
+delimiter $$
+CREATE TRIGGER delete_Booking 
 AFTER DELETE ON Bookings
 FOR EACH ROW
 BEGIN
-    UPDATE Rooms
-    SET AvailabilityStatus = 'Available'
+
+	UPDATE Rooms 
+    SET AvaibilityStatus = TRUE
     WHERE RoomID = OLD.RoomID;
+
 END $$
-DELIMITER ;
+delimiter ;

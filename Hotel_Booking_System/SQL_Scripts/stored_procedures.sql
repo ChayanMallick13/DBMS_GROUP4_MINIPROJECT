@@ -1,77 +1,54 @@
+
+
 USE HOTEL_MANAGEMENT_SYSTEM;
 
-DROP PROCEDURE IF EXISTS sp_BookRoom;
+DROP PROCEDURE IF EXISTS make_booking ;
 
 DELIMITER $$
-CREATE PROCEDURE sp_BookRoom (
-    IN p_BookingID INT,       
-    IN p_GuestID INT,        
-    IN p_RoomID INT,          
-    IN p_CheckInDate DATE,   
-    IN p_CheckOutDate DATE,  
-    IN p_Amount DECIMAL(10,2)
+CREATE PROCEDURE make_booking(
+	IN p_guestId INT ,
+    IN p_roomId INT ,
+    IN p_inDate DATE ,
+    IN p_outdate DATE
 )
 BEGIN
-   
-    INSERT INTO Bookings (BookingID, GuestID, RoomID, CheckInDate, CheckOutDate)
-    VALUES (p_BookingID, p_GuestID, p_RoomID, p_CheckInDate, p_CheckOutDate);
-    
-    
-    INSERT INTO Payments (PaymentID, BookingID, Amount, PaymentDate)
-    VALUES (p_BookingID, p_BookingID, p_Amount, CURDATE());
-    
-    
-    UPDATE Rooms
-    SET AvailabilityStatus = 'Booked'
-    WHERE RoomID = p_RoomID;
 
-    SELECT * FROM Bookings b JOIN Payments p ON b.BookingID = p.BookingID JOIN Rooms r ON r.RoomID = b.RoomID; 
+	DECLARE v_newBid INT;
+    DECLARE v_newPid INT;
+    DECLARE v_amount DECIMAL(10,2);
+    
+    SELECT MAX(BookingID) + 1
+    INTO v_newBid
+    FROM Bookings;
+    
+    SELECT MAX(PaymentId) +1 
+    INTO v_newPid
+    FROM Payments;
+    
+    SELECT Price 
+    INTO v_amount
+    FROM Rooms WHERE 
+    RoomID = p_roomId;
+    
+    
+    INSERT INTO Bookings VALUES (v_newBid,p_guestId,p_roomId,p_inDate,p_outdate);
+    INSERT INTO Payments VALUES (v_newPid,v_newBid,v_amount,p_inDate);
+
 END $$
-DELIMITER ;
+delimiter ;
 
 
-DROP PROCEDURE IF EXISTS sp_GetGuestBookings;
+DROP PROCEDURE IF EXISTS delete_Booking;
 
-
-DELIMITER $$
-CREATE PROCEDURE sp_GetGuestBookings (
-    IN p_GuestID INT
+delimiter $$
+CREATE PROCEDURE delete_Booking(
+	IN p_booking_id INT
 )
 BEGIN
-    SELECT b.BookingID, g.Name, r.RoomType, b.CheckInDate, b.CheckOutDate, p.Amount
-    FROM Bookings b
-    JOIN Guests g ON b.GuestID = g.GuestID
-    JOIN Rooms r ON b.RoomID = r.RoomID
-    LEFT JOIN Payments p ON b.BookingID = p.BookingID
-    WHERE g.GuestID = p_GuestID;
+
+	DELETE FROM Bookings
+    WHERE BookingId = p_booking_id;
+
+
 END $$
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sp_ListBookingsWithCursor;
-
-
-DELIMITER $$
-CREATE PROCEDURE sp_ListBookingsWithCursor()
-BEGIN
-    DECLARE v_BookingID INT;
-    DECLARE v_GuestID INT;
-    DECLARE v_RoomID INT;
-    DECLARE v_CheckIn DATE;
-    DECLARE v_CheckOut DATE;
-    DECLARE done INT DEFAULT 0;
-    
-    DECLARE bookingCursor CURSOR FOR
-        SELECT BookingID, GuestID, RoomID, CheckInDate, CheckOutDate FROM Bookings;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-    
-    OPEN bookingCursor;
-    read_loop: LOOP
-        FETCH bookingCursor INTO v_BookingID, v_GuestID, v_RoomID, v_CheckIn, v_CheckOut;
-        IF done = 1 THEN
-            LEAVE read_loop;
-        END IF;
-        SELECT v_BookingID AS BookingID, v_GuestID AS GuestID, v_RoomID AS RoomID, v_CheckIn AS CheckInDate, v_CheckOut AS CheckOutDate;
-    END LOOP;
-    CLOSE bookingCursor;
-END $$
-DELIMITER ;
+delimiter ;
