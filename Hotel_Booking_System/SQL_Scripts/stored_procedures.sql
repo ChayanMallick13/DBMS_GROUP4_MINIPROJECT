@@ -1,28 +1,26 @@
 USE HOTEL_MANAGEMENT_SYSTEM;
 
--- Drop the stored procedure sp_BookRoom if it exists.
 DROP PROCEDURE IF EXISTS sp_BookRoom;
 
--- Create the stored procedure sp_BookRoom.
 DELIMITER $$
 CREATE PROCEDURE sp_BookRoom (
-    IN p_BookingID INT,       -- Booking ID provided manually.
-    IN p_GuestID INT,         -- Guest ID making the booking.
-    IN p_RoomID INT,          -- Room ID to be booked.
-    IN p_CheckInDate DATE,    -- Check-in date.
-    IN p_CheckOutDate DATE,   -- Check-out date.
-    IN p_Amount DECIMAL(10,2) -- Payment amount.
+    IN p_BookingID INT,       
+    IN p_GuestID INT,        
+    IN p_RoomID INT,          
+    IN p_CheckInDate DATE,   
+    IN p_CheckOutDate DATE,  
+    IN p_Amount DECIMAL(10,2)
 )
 BEGIN
-    -- Insert a new booking record.
+   
     INSERT INTO Bookings (BookingID, GuestID, RoomID, CheckInDate, CheckOutDate)
     VALUES (p_BookingID, p_GuestID, p_RoomID, p_CheckInDate, p_CheckOutDate);
     
-    -- Insert a payment record corresponding to the booking.
+    
     INSERT INTO Payments (PaymentID, BookingID, Amount, PaymentDate)
     VALUES (p_BookingID, p_BookingID, p_Amount, CURDATE());
     
-    -- Update the room's availability status to 'Booked'.
+    
     UPDATE Rooms
     SET AvailabilityStatus = 'Booked'
     WHERE RoomID = p_RoomID;
@@ -31,10 +29,10 @@ BEGIN
 END $$
 DELIMITER ;
 
--- Drop the stored procedure sp_GetGuestBookings if it exists.
+
 DROP PROCEDURE IF EXISTS sp_GetGuestBookings;
 
--- Create the stored procedure sp_GetGuestBookings.
+
 DELIMITER $$
 CREATE PROCEDURE sp_GetGuestBookings (
     IN p_GuestID INT
@@ -49,10 +47,9 @@ BEGIN
 END $$
 DELIMITER ;
 
--- Drop the stored procedure sp_ListBookingsWithCursor if it exists.
 DROP PROCEDURE IF EXISTS sp_ListBookingsWithCursor;
 
--- Create the stored procedure sp_ListBookingsWithCursor.
+
 DELIMITER $$
 CREATE PROCEDURE sp_ListBookingsWithCursor()
 BEGIN
@@ -73,7 +70,6 @@ BEGIN
         IF done = 1 THEN
             LEAVE read_loop;
         END IF;
-        -- Return each booking record.
         SELECT v_BookingID AS BookingID, v_GuestID AS GuestID, v_RoomID AS RoomID, v_CheckIn AS CheckInDate, v_CheckOut AS CheckOutDate;
     END LOOP;
     CLOSE bookingCursor;

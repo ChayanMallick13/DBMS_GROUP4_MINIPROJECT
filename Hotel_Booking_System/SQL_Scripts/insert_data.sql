@@ -1,6 +1,5 @@
 USE HOTEL_MANAGEMENT_SYSTEM;
 
--- Inserting diverse sample data into the Guests table.
 INSERT INTO Guests (GuestID, Name, Contact, Email) VALUES 
 (1, 'Alice Johnson', '555-1234', 'alice@example.com'),
 (2, 'Bob Smith', '555-5678', 'bob@example.com'),
@@ -11,7 +10,6 @@ INSERT INTO Guests (GuestID, Name, Contact, Email) VALUES
 (7, 'Grace Wilson', '555-2468', 'grace@example.com'),
 (8, 'Henry Davis', '555-1357', 'henry@example.com');
 
--- Inserting diverse sample data into the Rooms table.
 INSERT INTO Rooms (RoomID, RoomType, Price, AvailabilityStatus) VALUES 
 (101, 'Single', 275.00, 'Available'),
 (102, 'Double', 420.00, 'Available'),
@@ -20,7 +18,6 @@ INSERT INTO Rooms (RoomID, RoomType, Price, AvailabilityStatus) VALUES
 (105, 'Single', 80.00, 'Under Maintenance'),
 (106, 'Double', 130.00, 'Available');
 
--- Inserting diverse sample data into the Bookings table.
 INSERT INTO Bookings (BookingID, GuestID, RoomID, CheckInDate, CheckOutDate) VALUES 
 (1, 1, 102, '2025-04-15', '2025-04-20'),
 (2, 2, 101, '2025-04-16', '2025-04-18'),
@@ -32,7 +29,6 @@ INSERT INTO Bookings (BookingID, GuestID, RoomID, CheckInDate, CheckOutDate) VAL
 (8, 7, 103, '2025-05-15', '2025-05-20'),
 (9, 8, 106, '2025-06-01', '2025-06-05');
 
--- Inserting diverse sample data into the Payments table.
 INSERT INTO Payments (PaymentID, BookingID, Amount, PaymentDate) VALUES 
 (1, 1, 600.00, '2025-04-15'),
 (2, 2, 150.00, '2025-04-16'),
